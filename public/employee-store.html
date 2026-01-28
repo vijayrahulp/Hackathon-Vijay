@@ -558,19 +558,35 @@
         // Find nearby offers
         async function findNearby() {
             if (!navigator.geolocation) {
-                alert('Geolocation is not supported by your browser');
+                const alertText = currentLang === 'ar' 
+                    ? 'متصفحك لا يدعم تحديد الموقع' 
+                    : 'Geolocation is not supported by your browser';
+                alert(alertText);
                 return;
             }
 
+            const loading = document.getElementById('loading');
+            loading.style.display = 'block';
+
             navigator.geolocation.getCurrentPosition(
-                (position) => {
+                async (position) => {
                     const lat = position.coords.latitude;
                     const lng = position.coords.longitude;
-                    loadOffers({ lat, lng, categoryId: currentCategory });
+                    console.log('User location:', lat, lng);
+                    
+                    await loadOffers({ 
+                        lat: lat, 
+                        lng: lng, 
+                        categoryId: currentCategory === 'all' ? undefined : currentCategory 
+                    });
                 },
                 (error) => {
-                    alert('Unable to retrieve your location');
-                    console.error(error);
+                    loading.style.display = 'none';
+                    const alertText = currentLang === 'ar' 
+                        ? 'تعذر الحصول على موقعك. يرجى التحقق من إذن الموقع.' 
+                        : 'Unable to retrieve your location. Please check location permissions.';
+                    alert(alertText);
+                    console.error('Geolocation error:', error);
                 }
             );
         }

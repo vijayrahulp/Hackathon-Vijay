@@ -34,12 +34,15 @@ function findNearbyOffers(offers, userLat, userLon, radiusKm = 10) {
     
     // Check each location of the offer
     for (const location of offer.locations) {
-      if (location.lat && location.lng) {
+      // Support both 'lng' and 'lon' property names
+      const locationLon = location.lng || location.lon;
+      
+      if (location.lat && locationLon) {
         const distance = calculateDistance(
           userLat,
           userLon,
           location.lat,
-          location.lng
+          locationLon
         );
         
         if (distance <= radiusKm) {

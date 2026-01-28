@@ -31,6 +31,8 @@ router.get('/offers', (req, res) => {
   try {
     const { categoryId, search, lat, lng, radius } = req.query;
 
+    console.log('Browse offers request:', { categoryId, search, lat, lng, radius });
+
     const filter = { status: 'active' };
     if (categoryId) {
       filter.categoryId = categoryId;
@@ -40,13 +42,16 @@ router.get('/offers', (req, res) => {
     }
 
     let offers = DewaStore.getOffers(filter);
+    console.log('Initial offers count:', offers.length);
 
     // Filter by location if coordinates provided
     if (lat && lng) {
       const userLat = parseFloat(lat);
       const userLon = parseFloat(lng);
       const radiusKm = radius ? parseFloat(radius) : 10;
+      console.log('Filtering by location:', { userLat, userLon, radiusKm });
       offers = findNearbyOffers(offers, userLat, userLon, radiusKm);
+      console.log('Nearby offers count:', offers.length);
     }
 
     // Enrich with vendor and category info
