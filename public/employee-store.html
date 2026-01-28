@@ -37,6 +37,29 @@
             align-items: center;
         }
 
+        .lang-toggle {
+            background: #00a651;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .lang-toggle:hover {
+            background: #008744;
+        }
+
+        [dir="rtl"] {
+            direction: rtl;
+        }
+
+        [dir="rtl"] .header h1 {
+            font-family: Arial, sans-serif;
+        }
+
         .container {
             max-width: 1400px;
             margin: 2rem auto;
@@ -286,26 +309,27 @@
 </head>
 <body>
     <div class="header">
-        <h1>🏪 DEWA Store</h1>
+        <h1 data-en="🏪 DEWA Store" data-ar="🏪 متجر ديوا">🏪 DEWA Store</h1>
         <div class="user-info">
+            <button class="lang-toggle" onclick="toggleLanguage()">العربية</button>
             <span id="userName"></span>
-            <button onclick="logout()" class="filter-btn">Logout</button>
+            <button onclick="logout()" class="filter-btn" data-en="Logout" data-ar="تسجيل الخروج">Logout</button>
         </div>
     </div>
 
     <div class="container">
         <div class="search-bar">
-            <input type="text" class="search-input" id="searchInput" placeholder="Search offers...">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search offers..." data-placeholder-en="Search offers..." data-placeholder-ar="ابحث عن العروض...">
             <div class="filters">
-                <button class="filter-btn active" onclick="filterCategory('all')">All</button>
+                <button class="filter-btn active" onclick="filterCategory('all')" data-en="All" data-ar="الكل">All</button>
                 <div id="categoryFilters"></div>
-                <button class="nearby-btn" onclick="findNearby()">📍 Offers Near Me</button>
+                <button class="nearby-btn" onclick="findNearby()" data-en="📍 Offers Near Me" data-ar="📍 عروض قريبة مني">📍 Offers Near Me</button>
             </div>
         </div>
 
         <div id="categoriesSection" class="categories"></div>
         <div id="offersGrid" class="offers-grid"></div>
-        <div id="loading" class="loading" style="display: none;">Loading...</div>
+        <div id="loading" class="loading" style="display: none;" data-en="Loading..." data-ar="جار التحميل...">Loading...</div>
     </div>
 
     <!-- QR Code Modal -->
@@ -337,6 +361,54 @@
         let allOffers = [];
         let categories = [];
         let favorites = [];
+        let currentLang = localStorage.getItem('language') || 'en';
+
+        // Language toggle function
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'ar' : 'en';
+            localStorage.setItem('language', currentLang);
+            applyLanguage();
+        }
+
+        function applyLanguage() {
+            const elements = document.querySelectorAll('[data-en]');
+            const toggleBtn = document.querySelector('.lang-toggle');
+            
+            // Update HTML direction
+            document.documentElement.setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
+            document.documentElement.setAttribute('lang', currentLang === 'ar' ? 'ar' : 'en');
+            
+            // Update toggle button text
+            toggleBtn.textContent = currentLang === 'en' ? 'العربية' : 'English';
+            
+            // Update all elements with data attributes
+            elements.forEach(el => {
+                const text = el.getAttribute(`data-${currentLang}`);
+                if (text) {
+                    if (el.tagName === 'INPUT') {
+                        el.placeholder = text;
+                    } else {
+                        el.textContent = text;
+                    }
+                }
+            });
+            
+            // Update input placeholders
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.placeholder = searchInput.getAttribute(`data-placeholder-${currentLang}`);
+            }
+            
+            // Reload offers to show correct language
+            if (allOffers.length > 0) {
+                renderOffers(allOffers);
+            }
+            
+            // Reload categories
+            if (categories.length > 0) {
+                renderCategories();
+            }
+        }
 
         // Load user info
         async function loadUserInfo() {
@@ -373,7 +445,7 @@
             container.innerHTML = categories.map(cat => `
                 <div class="category-card" onclick="filterCategory('${cat.id}')">
                     <div class="category-icon">${cat.icon}</div>
-                    <div>${cat.name}</div>
+                    <div>${currentLang === 'ar' && cat.nameAr ? cat.nameAr : cat.name}</div>
                 </div>
             `).join('');
         }
@@ -382,7 +454,7 @@
         function renderCategoryFilters() {
             const container = document.getElementById('categoryFilters');
             container.innerHTML = categories.map(cat => `
-                <button class="filter-btn" onclick="filterCategory('${cat.id}')">${cat.name}</button>
+                <button class="filter-btn" onclick="filterCategory('${cat.id}')">${currentLang === 'ar' && cat.nameAr ? cat.nameAr : cat.name}</button>
             `).join('');
         }
 
@@ -423,26 +495,37 @@
             const grid = document.getElementById('offersGrid');
             
             if (offers.length === 0) {
-                grid.innerHTML = '<div style="color: white; text-align: center; width: 100%;">No offers found</div>';
+                const noOffersText = currentLang === 'ar' ? 'لا توجد عروض' : 'No offers found';
+                grid.innerHTML = `<div style="color: white; text-align: center; width: 100%;">${noOffersText}</div>`;
                 return;
             }
 
             grid.innerHTML = offers.map(offer => {
                 const isFavorite = favorites.includes(offer.id);
+                
+                // Display in current language
+                const title = currentLang === 'ar' && offer.titleAr ? offer.titleAr : offer.title;
+                const description = currentLang === 'ar' && offer.descriptionAr ? offer.descriptionAr : offer.description;
+                const vendorName = currentLang === 'ar' && offer.vendor?.companyNameAr 
+                    ? offer.vendor.companyNameAr 
+                    : (offer.vendor?.companyName || 'Vendor');
+                
                 const discount = offer.discountType === 'percentage' 
-                    ? `${offer.discountValue}% OFF`
-                    : `AED ${offer.discountValue} OFF`;
+                    ? (currentLang === 'ar' ? `خصم ${offer.discountValue}%` : `${offer.discountValue}% OFF`)
+                    : (currentLang === 'ar' ? `خصم ${offer.discountValue} درهم` : `AED ${offer.discountValue} OFF`);
+                
+                const viewDetailsText = currentLang === 'ar' ? 'عرض التفاصيل' : 'View Details';
 
                 return `
                     <div class="offer-card">
                         <div class="offer-image">🎁</div>
                         <div class="offer-content">
-                            <div class="vendor-name">${offer.vendor?.companyName || 'Vendor'}</div>
-                            <div class="offer-title">${offer.title}</div>
+                            <div class="vendor-name">${vendorName}</div>
+                            <div class="offer-title">${title}</div>
                             <div class="discount-badge">${discount}</div>
-                            <div class="offer-details">${offer.description.substring(0, 100)}...</div>
+                            <div class="offer-details">${description.substring(0, 100)}...</div>
                             <div class="offer-actions">
-                                <button class="btn-primary" onclick="showOfferDetails('${offer.id}')">View Details</button>
+                                <button class="btn-primary" onclick="showOfferDetails('${offer.id}')">${viewDetailsText}</button>
                                 <button class="btn-favorite ${isFavorite ? 'active' : ''}" onclick="toggleFavorite('${offer.id}')">
                                     ${isFavorite ? '❤️' : '🤍'}
                                 </button>
@@ -605,6 +688,7 @@
 
         // Initialize
         window.addEventListener('DOMContentLoaded', () => {
+            applyLanguage(); // Apply saved language preference
             loadUserInfo();
             loadCategories();
             loadFavorites();

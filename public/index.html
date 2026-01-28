@@ -28,6 +28,25 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
+        .lang-toggle-btn {
+            background: #2d7a4f;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .lang-toggle-btn:hover {
+            background: #1a5c3a;
+        }
+
+        [dir="rtl"] body {
+            font-family: 'Arial', 'Tahoma', sans-serif;
+        }
+
         .logo-left {
             display: flex;
             align-items: center;
@@ -220,9 +239,10 @@
 <body>
     <div class="header">
         <div class="logo-left">
-            <div class="logo-text">🏛️ Government Portal</div>
+            <div class="logo-text" data-en="🏛️ Government Portal" data-ar="🏛️ البوابة الحكومية">🏛️ Government Portal</div>
         </div>
-        <div class="logo-text">Dubai Electricity & Water Authority</div>
+        <button class="lang-toggle-btn" onclick="toggleLanguage()">العربية</button>
+        <div class="logo-text" data-en="Dubai Electricity & Water Authority" data-ar="هيئة كهرباء ومياه دبي">Dubai Electricity & Water Authority</div>
     </div>
 
     <div class="main-content">
@@ -234,8 +254,8 @@
                     <text x="120" y="50" font-size="32" font-weight="bold" fill="#2d7a4f">OneID</text>
                 </svg>
             </div>
-            <h1 class="oneid-title">OneID Portal</h1>
-            <p class="oneid-description">
+            <h1 class="oneid-title" data-en="OneID Portal" data-ar="بوابة الهوية الواحدة">OneID Portal</h1>
+            <p class="oneid-description" data-en="One secure Login for all your DEWA applications. OneID Portal offers single sign-on service to access your applications seamlessly- all in one place and from any device." data-ar="تسجيل دخول واحد آمن لجميع تطبيقات ديوا. توفر بوابة الهوية الواحدة خدمة تسجيل الدخول الموحد للوصول إلى تطبيقاتك بسلاسة - كل شيء في مكان واحد ومن أي جهاز.">
                 One secure Login for all your DEWA applications. OneID Portal offers single 
                 sign-on service to access your applications seamlessly- all in one place and 
                 from any device.
@@ -245,7 +265,7 @@
         <div class="right-section">
             <div class="login-card">
                 <div class="login-header">
-                    <h2 class="login-title">Login</h2>
+                    <h2 class="login-title" data-en="Login" data-ar="تسجيل الدخول">Login</h2>
                     <div class="info-icon" title="Information">i</div>
                 </div>
 
@@ -253,7 +273,7 @@
 
                 <form id="login-form">
                     <div class="form-group">
-                        <label class="form-label" for="username">Username</label>
+                        <label class="form-label" for="username" data-en="Username" data-ar="اسم المستخدم">Username</label>
                         <input 
                             type="text" 
                             id="username" 
@@ -265,29 +285,31 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label" for="password">Password</label>
+                        <label class="form-label" for="password" data-en="Password" data-ar="كلمة المرور">Password</label>
                         <input 
                             type="password" 
                             id="password" 
                             name="password"
                             class="form-input" 
                             placeholder="Enter your password"
+                            data-placeholder-en="Enter your password"
+                            data-placeholder-ar="أدخل كلمة المرور"
                             required
                         >
                     </div>
 
-                    <button type="submit" class="login-btn">LOGIN</button>
+                    <button type="submit" class="login-btn" data-en="LOGIN" data-ar="تسجيل الدخول">LOGIN</button>
                 </form>
 
-                <a href="#" class="forgot-link">Forgot Password/Unlock Account</a>
+                <a href="#" class="forgot-link" data-en="Forgot Password/Unlock Account" data-ar="نسيت كلمة المرور / فتح الحساب">Forgot Password/Unlock Account</a>
 
                 <div style="text-align: center; margin: 1.5rem 0;">
                     <div style="display: flex; align-items: center; margin: 1rem 0;">
                         <div style="flex: 1; height: 1px; background: #ddd;"></div>
-                        <span style="padding: 0 1rem; color: #666; font-size: 0.9rem;">OR</span>
+                        <span style="padding: 0 1rem; color: #666; font-size: 0.9rem;" data-en="OR" data-ar="أو">OR</span>
                         <div style="flex: 1; height: 1px; background: #ddd;"></div>
                     </div>
-                    <a href="/auth/login" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border: 2px solid #2d7a4f; color: #2d7a4f; text-decoration: none; border-radius: 6px; font-weight: 500; transition: all 0.3s;">
+                    <a href="/auth/login" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border: 2px solid #2d7a4f; color: #2d7a4f; text-decoration: none; border-radius: 6px; font-weight: 500; transition: all 0.3s;" data-en="🔐 Login with Google OAuth" data-ar="🔐 تسجيل الدخول باستخدام جوجل">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"/>
                         </svg>
@@ -308,6 +330,46 @@
     </div>
 
     <script>
+        // Language Management
+        let currentLang = localStorage.getItem('language') || 'en';
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'ar' : 'en';
+            localStorage.setItem('language', currentLang);
+            applyLanguage();
+        }
+
+        function applyLanguage() {
+            const elements = document.querySelectorAll('[data-en]');
+            const toggleBtn = document.querySelector('.lang-toggle-btn');
+            
+            // Update HTML direction
+            document.documentElement.setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
+            document.documentElement.setAttribute('lang', currentLang === 'ar' ? 'ar' : 'en');
+            
+            // Update toggle button text
+            toggleBtn.textContent = currentLang === 'en' ? 'العربية' : 'English';
+            
+            // Update all elements with data attributes
+            elements.forEach(el => {
+                const text = el.getAttribute(`data-${currentLang}`);
+                if (text) {
+                    if (el.tagName === 'INPUT') {
+                        el.placeholder = text;
+                    } else if (el.hasAttribute('data-placeholder-en')) {
+                        el.placeholder = el.getAttribute(`data-placeholder-${currentLang}`);
+                    } else {
+                        el.textContent = text;
+                    }
+                }
+            });
+        }
+
+        // Apply language on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            applyLanguage();
+        });
+
         // Check for error parameters in URL
         const urlParams = new URLSearchParams(window.location.search);
         const error = urlParams.get('error');
