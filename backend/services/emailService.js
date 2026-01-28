@@ -6,14 +6,24 @@ const nodemailer = require('nodemailer');
 function createTransporter() {
   // Check if email is configured
   if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
+    console.log('⚠️  Email credentials not configured');
+    console.log('   EMAIL_USER:', process.env.EMAIL_USER ? 'Set' : 'Missing');
+    console.log('   EMAIL_PASSWORD:', process.env.EMAIL_PASSWORD ? 'Set' : 'Missing');
     return null;
   }
 
+  console.log('✅ Email transporter configured for:', process.env.EMAIL_USER);
+  
   return nodemailer.createTransport({
-    service: process.env.EMAIL_SERVICE || 'gmail',
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false, // use TLS
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASSWORD
+    },
+    tls: {
+      rejectUnauthorized: false
     }
   });
 }

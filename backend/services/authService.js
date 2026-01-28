@@ -28,6 +28,39 @@ const users = [
     // Password: "Demo@123"
     passwordHash: '$2b$10$S5dIIsooNVg9UuesIhq5X.vny6ZpBmjtFluexGNvKDAh1/ThChGzW',
     name: 'Vijay Rahul'
+  },
+  {
+    id: '4',
+    username: 'employee1',
+    email: 'ahmed.hassan@dewa.gov.ae',
+    // Password: "Employee@123"
+    passwordHash: '$2b$10$V.hERgZQISmdoTz1nukhjuplOmVHp.AxU08NbuOdGm8jwyKGm57Ki',
+    name: 'Ahmed Hassan',
+    role: 'employee',
+    employeeId: 'EMP001',
+    department: 'Customer Service'
+  },
+  {
+    id: '5',
+    username: 'employee2',
+    email: 'fatima.ali@dewa.gov.ae',
+    // Password: "Employee@123"
+    passwordHash: '$2b$10$V.hERgZQISmdoTz1nukhjuplOmVHp.AxU08NbuOdGm8jwyKGm57Ki',
+    name: 'Fatima Ali',
+    role: 'employee',
+    employeeId: 'EMP002',
+    department: 'IT Services'
+  },
+  {
+    id: '6',
+    username: 'employee3',
+    email: 'mohammed.khalid@dewa.gov.ae',
+    // Password: "Employee@123"
+    passwordHash: '$2b$10$V.hERgZQISmdoTz1nukhjuplOmVHp.AxU08NbuOdGm8jwyKGm57Ki',
+    name: 'Mohammed Khalid',
+    role: 'employee',
+    employeeId: 'EMP003',
+    department: 'Operations'
   }
 ];
 

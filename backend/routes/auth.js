@@ -50,6 +50,61 @@ router.post('/login/custom', async (req, res) => {
       });
     }
 
+    // Check if user is admin - bypass OTP for admin accounts
+    if (user.username === 'admin' || user.role === 'admin') {
+      // Create session directly for admin
+      req.session.user = {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        name: user.name,
+        role: 'admin'
+      };
+
+      return res.json({
+        success: true,
+        requiresOTP: false,
+        isAdmin: true,
+        redirectUrl: '/admin-dashboard.html',
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: 'admin'
+        }
+      });
+    }
+
+    // Check if user is employee - bypass OTP for employee accounts
+    if (user.role === 'employee') {
+      // Create session directly for employee
+      req.session.user = {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        name: user.name,
+        role: 'employee',
+        employeeId: user.employeeId,
+        department: user.department
+      };
+
+      return res.json({
+        success: true,
+        requiresOTP: false,
+        isEmployee: true,
+        redirectUrl: '/employee-store.html',
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: 'employee',
+          employeeId: user.employeeId,
+          department: user.department
+        }
+      });
+    }
+
+    // For non-admin users, continue with OTP flow
     // Generate and store OTP
     const otp = generateOTP();
     storeOTP(user.id, otp);
@@ -281,11 +336,12 @@ router.get('/callback', async (req, res) => {
       email: userInfo.email,
       name: userInfo.name || userInfo.preferred_username,
       picture: userInfo.picture,
+      role: 'employee', // OAuth users are treated as employees
       accessToken: accessToken // Store for API calls if needed
     };
 
-    // Redirect to dashboard
-    res.redirect('/dashboard');
+    // Redirect OAuth users directly to employee store (DEWA Store)
+    res.redirect('/employee-store.html');
   } catch (error) {
     console.error('Authentication error:', error.message);
     res.redirect('/?error=auth_failed');

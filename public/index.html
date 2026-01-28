@@ -329,9 +329,6 @@
                 case 'auth_failed':
                     errorMessage = 'Authentication failed. Please check your credentials.';
                     break;
-                case 'session_expired':
-                    errorMessage = 'Your session has expired. Please login again.';
-                    break;
                 default:
                     errorMessage = 'An error occurred. Please try again.';
             }
@@ -367,8 +364,14 @@
                 
                 const data = await response.json();
                 
-                if (data.success && data.requiresOTP) {
-                    // Redirect to OTP verification page
+                if (data.success && data.isAdmin) {
+                    // Admin user - redirect directly to admin console
+                    window.location.href = data.redirectUrl || '/admin-dashboard.html';
+                } else if (data.success && data.isEmployee) {
+                    // Employee user - redirect directly to employee store
+                    window.location.href = data.redirectUrl || '/employee-store.html';
+                } else if (data.success && data.requiresOTP) {
+                    // Regular user - redirect to OTP verification page
                     window.location.href = '/verify-otp.html?email=' + encodeURIComponent(data.email);
                 } else {
                     errorDiv.innerHTML = `<div class="error">${data.error || 'Authentication failed'}</div>`;

@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEWA Store - Employee Offers</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #00a651 0%, #008744 100%);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #00a651;
+            font-size: 1.5rem;
+        }
+
+        .user-info {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .search-bar {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .filters {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #00a651;
+            background: white;
+            color: #00a651;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-btn.active {
+            background: #00a651;
+            color: white;
+        }
+
+        .nearby-btn {
+            background: #00a651;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .category-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+
+        .category-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .offers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .offer-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+
+        .offer-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+
+        .offer-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #00a651, #008744);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+        }
+
+        .offer-content {
+            padding: 1.5rem;
+        }
+
+        .vendor-name {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .offer-title {
+            font-size: 1.2rem;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .discount-badge {
+            background: #ff4444;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            display: inline-block;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .offer-details {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .offer-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-primary {
+            flex: 1;
+            background: #00a651;
+            color: white;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-favorite {
+            width: 40px;
+            height: 40px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .btn-favorite.active {
+            color: #ff4444;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 10px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .qr-code {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .qr-code img {
+            width: 250px;
+            height: 250px;
+            margin: 1rem auto;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: white;
+        }
+
+        .error {
+            background: #ff4444;
+            color: white;
+            padding: 1rem;
+            border-radius: 5px;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏪 DEWA Store</h1>
+        <div class="user-info">
+            <span id="userName"></span>
+            <button onclick="logout()" class="filter-btn">Logout</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="search-bar">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search offers...">
+            <div class="filters">
+                <button class="filter-btn active" onclick="filterCategory('all')">All</button>
+                <div id="categoryFilters"></div>
+                <button class="nearby-btn" onclick="findNearby()">📍 Offers Near Me</button>
+            </div>
+        </div>
+
+        <div id="categoriesSection" class="categories"></div>
+        <div id="offersGrid" class="offers-grid"></div>
+        <div id="loading" class="loading" style="display: none;">Loading...</div>
+    </div>
+
+    <!-- QR Code Modal -->
+    <div id="qrModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Scan to Redeem</h2>
+                <button class="close-btn" onclick="closeQRModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="qr-code" id="qrCodeContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Offer Details Modal -->
+    <div id="detailsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Offer Details</h2>
+                <button class="close-btn" onclick="closeDetailsModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="offerDetails"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentCategory = 'all';
+        let allOffers = [];
+        let categories = [];
+        let favorites = [];
+
+        // Load user info
+        async function loadUserInfo() {
+            try {
+                const response = await fetch('/api/profile');
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('userName').textContent = data.user.name || data.user.username;
+                }
+            } catch (error) {
+                console.error('Error loading user info:', error);
+            }
+        }
+
+        // Load categories
+        async function loadCategories() {
+            try {
+                const response = await fetch('/api/store/categories');
+                const data = await response.json();
+                
+                if (data.success) {
+                    categories = data.categories;
+                    renderCategories();
+                    renderCategoryFilters();
+                }
+            } catch (error) {
+                console.error('Error loading categories:', error);
+            }
+        }
+
+        // Render categories
+        function renderCategories() {
+            const container = document.getElementById('categoriesSection');
+            container.innerHTML = categories.map(cat => `
+                <div class="category-card" onclick="filterCategory('${cat.id}')">
+                    <div class="category-icon">${cat.icon}</div>
+                    <div>${cat.name}</div>
+                </div>
+            `).join('');
+        }
+
+        // Render category filters
+        function renderCategoryFilters() {
+            const container = document.getElementById('categoryFilters');
+            container.innerHTML = categories.map(cat => `
+                <button class="filter-btn" onclick="filterCategory('${cat.id}')">${cat.name}</button>
+            `).join('');
+        }
+
+        // Load offers
+        async function loadOffers(filters = {}) {
+            const loading = document.getElementById('loading');
+            loading.style.display = 'block';
+
+            try {
+                const params = new URLSearchParams();
+                if (filters.categoryId && filters.categoryId !== 'all') {
+                    params.append('categoryId', filters.categoryId);
+                }
+                if (filters.search) {
+                    params.append('search', filters.search);
+                }
+                if (filters.lat && filters.lng) {
+                    params.append('lat', filters.lat);
+                    params.append('lng', filters.lng);
+                }
+
+                const response = await fetch(`/api/store/offers?${params}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    allOffers = data.offers;
+                    renderOffers(allOffers);
+                }
+            } catch (error) {
+                console.error('Error loading offers:', error);
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        // Render offers
+        function renderOffers(offers) {
+            const grid = document.getElementById('offersGrid');
+            
+            if (offers.length === 0) {
+                grid.innerHTML = '<div style="color: white; text-align: center; width: 100%;">No offers found</div>';
+                return;
+            }
+
+            grid.innerHTML = offers.map(offer => {
+                const isFavorite = favorites.includes(offer.id);
+                const discount = offer.discountType === 'percentage' 
+                    ? `${offer.discountValue}% OFF`
+                    : `AED ${offer.discountValue} OFF`;
+
+                return `
+                    <div class="offer-card">
+                        <div class="offer-image">🎁</div>
+                        <div class="offer-content">
+                            <div class="vendor-name">${offer.vendor?.companyName || 'Vendor'}</div>
+                            <div class="offer-title">${offer.title}</div>
+                            <div class="discount-badge">${discount}</div>
+                            <div class="offer-details">${offer.description.substring(0, 100)}...</div>
+                            <div class="offer-actions">
+                                <button class="btn-primary" onclick="showOfferDetails('${offer.id}')">View Details</button>
+                                <button class="btn-favorite ${isFavorite ? 'active' : ''}" onclick="toggleFavorite('${offer.id}')">
+                                    ${isFavorite ? '❤️' : '🤍'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Filter by category
+        function filterCategory(categoryId) {
+            currentCategory = categoryId;
+            
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            loadOffers({ categoryId });
+        }
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const search = e.target.value;
+            loadOffers({ categoryId: currentCategory, search });
+        });
+
+        // Find nearby offers
+        async function findNearby() {
+            if (!navigator.geolocation) {
+                alert('Geolocation is not supported by your browser');
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    loadOffers({ lat, lng, categoryId: currentCategory });
+                },
+                (error) => {
+                    alert('Unable to retrieve your location');
+                    console.error(error);
+                }
+            );
+        }
+
+        // Show offer details
+        async function showOfferDetails(offerId) {
+            try {
+                const response = await fetch(`/api/store/offers/${offerId}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    const offer = data.offer;
+                    const discount = offer.discountType === 'percentage'
+                        ? `${offer.discountValue}% OFF`
+                        : `AED ${offer.discountValue} OFF`;
+
+                    document.getElementById('offerDetails').innerHTML = `
+                        <h3>${offer.title}</h3>
+                        <p><strong>Vendor:</strong> ${offer.vendor?.companyName}</p>
+                        <div class="discount-badge">${discount}</div>
+                        <p><strong>Description:</strong></p>
+                        <p>${offer.description}</p>
+                        <p><strong>Valid Until:</strong> ${new Date(offer.endDate).toLocaleDateString()}</p>
+                        <p><strong>Terms & Conditions:</strong></p>
+                        <p>${offer.terms}</p>
+                        <button class="btn-primary" onclick="generateQRCode('${offerId}')">Get QR Code</button>
+                    `;
+
+                    document.getElementById('detailsModal').classList.add('active');
+                }
+            } catch (error) {
+                console.error('Error loading offer details:', error);
+            }
+        }
+
+        // Generate QR Code
+        async function generateQRCode(offerId) {
+            try {
+                const response = await fetch(`/api/store/offers/${offerId}/qr`, {
+                    method: 'POST'
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('qrCodeContent').innerHTML = `
+                        <h3>Show this code to vendor</h3>
+                        <div style="font-size: 2rem; font-weight: bold; padding: 2rem; background: #f5f5f5; border-radius: 10px; margin: 1rem 0;">
+                            ${data.qrCode}
+                        </div>
+                        <p>Code expires in ${data.expiresIn} seconds</p>
+                        <p style="color: #666; font-size: 0.9rem;">This code can only be used once</p>
+                    `;
+
+                    closeDetailsModal();
+                    document.getElementById('qrModal').classList.add('active');
+                } else {
+                    alert(data.error || 'Failed to generate QR code');
+                }
+            } catch (error) {
+                console.error('Error generating QR code:', error);
+                alert('Failed to generate QR code');
+            }
+        }
+
+        // Toggle favorite
+        async function toggleFavorite(offerId) {
+            try {
+                const isFavorite = favorites.includes(offerId);
+                const method = isFavorite ? 'DELETE' : 'POST';
+                
+                const response = await fetch(`/api/store/favorites/${offerId}`, { method });
+                const data = await response.json();
+
+                if (data.success) {
+                    if (isFavorite) {
+                        favorites = favorites.filter(id => id !== offerId);
+                    } else {
+                        favorites.push(offerId);
+                    }
+                    renderOffers(allOffers);
+                }
+            } catch (error) {
+                console.error('Error toggling favorite:', error);
+            }
+        }
+
+        // Load favorites
+        async function loadFavorites() {
+            try {
+                const response = await fetch('/api/store/favorites');
+                const data = await response.json();
+
+                if (data.success) {
+                    favorites = data.favorites.map(f => f.id);
+                }
+            } catch (error) {
+                console.error('Error loading favorites:', error);
+            }
+        }
+
+        // Close modals
+        function closeQRModal() {
+            document.getElementById('qrModal').classList.remove('active');
+        }
+
+        function closeDetailsModal() {
+            document.getElementById('detailsModal').classList.remove('active');
+        }
+
+        // Logout
+        function logout() {
+            fetch('/auth/logout', { method: 'POST' })
+                .then(() => window.location.href = '/');
+        }
+
+        // Initialize
+        window.addEventListener('DOMContentLoaded', () => {
+            loadUserInfo();
+            loadCategories();
+            loadFavorites();
+            loadOffers();
+        });
+    </script>
+</body>
+</html>
