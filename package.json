@@ -1,0 +1,12 @@
+{
+  "name": "oneid-integration-app",
+  "version": "1.0.0",
+  "description": "Node.js application with One Id OAuth integration",
+  "scripts": {
+    "dev": "node backend/server.js",
+    "start": "node backend/server.js"
+  },
+  "keywords": ["oauth", "oneid", "authentication"],
+  "author": "",
+  "license": "ISC"
+}

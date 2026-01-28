@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OneID Portal - Verify OTP</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #f5f5f5;
+        }
+
+        .header {
+            background: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo-text {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .otp-container {
+            background: white;
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .otp-icon {
+            text-align: center;
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2d7a4f;
+            margin-bottom: 0.5rem;
+            font-size: 2rem;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+
+        .email-display {
+            background: #f0f8f4;
+            padding: 1rem;
+            border-radius: 6px;
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #2d7a4f;
+            font-weight: 500;
+        }
+
+        .otp-inputs {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .otp-input {
+            width: 50px;
+            height: 60px;
+            text-align: center;
+            font-size: 2rem;
+            font-weight: bold;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            transition: border-color 0.3s;
+        }
+
+        .otp-input:focus {
+            outline: none;
+            border-color: #2d7a4f;
+        }
+
+        .verify-btn {
+            width: 100%;
+            background: #2d7a4f;
+            color: white;
+            border: none;
+            padding: 1rem;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-bottom: 1rem;
+        }
+
+        .verify-btn:hover:not(:disabled) {
+            background: #235c3c;
+        }
+
+        .verify-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .resend-section {
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .resend-btn {
+            background: none;
+            border: none;
+            color: #2d7a4f;
+            cursor: pointer;
+            text-decoration: underline;
+            font-size: 0.9rem;
+            padding: 0;
+        }
+
+        .resend-btn:hover {
+            color: #235c3c;
+        }
+
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            text-align: center;
+            border: 1px solid #fcc;
+        }
+
+        .success {
+            background: #efe;
+            color: #2d7a4f;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            text-align: center;
+            border: 1px solid #cfc;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #666;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            color: #2d7a4f;
+            text-decoration: underline;
+        }
+
+        .footer {
+            background: white;
+            padding: 1.5rem 2rem;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo-text">🏛️ Government Portal</div>
+        <div class="logo-text">Dubai Electricity & Water Authority</div>
+    </div>
+
+    <div class="main-content">
+        <div class="otp-container">
+            <div class="otp-icon">🔐</div>
+            <h1>Verify Your Identity</h1>
+            <p class="subtitle">Enter the 6-digit code sent to your email</p>
+
+            <div class="email-display" id="email-display">
+                Sending OTP...
+            </div>
+
+            <div id="message"></div>
+
+            <div class="otp-inputs">
+                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric">
+                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric">
+                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric">
+                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric">
+                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric">
+                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric">
+            </div>
+
+            <button id="verify-btn" class="verify-btn">VERIFY</button>
+
+            <div class="resend-section">
+                Didn't receive the code? 
+                <button id="resend-btn" class="resend-btn">Resend OTP</button>
+            </div>
+
+            <a href="/" class="back-link">← Back to Login</a>
+        </div>
+    </div>
+
+    <div class="footer">
+        If you need urgent assistance, please contact Help desk at 045151555
+    </div>
+
+    <script>
+        const otpInputs = document.querySelectorAll('.otp-input');
+        const verifyBtn = document.getElementById('verify-btn');
+        const resendBtn = document.getElementById('resend-btn');
+        const messageDiv = document.getElementById('message');
+        const emailDisplay = document.getElementById('email-display');
+
+        // Display email from URL params
+        const urlParams = new URLSearchParams(window.location.search);
+        const email = urlParams.get('email');
+        if (email) {
+            emailDisplay.textContent = email;
+        }
+
+        // Auto-focus and navigation between OTP inputs
+        otpInputs.forEach((input, index) => {
+            input.addEventListener('input', (e) => {
+                if (e.target.value.length === 1 && index < otpInputs.length - 1) {
+                    otpInputs[index + 1].focus();
+                }
+                
+                // Auto-submit when all digits entered
+                const otp = Array.from(otpInputs).map(inp => inp.value).join('');
+                if (otp.length === 6) {
+                    verifyOTP(otp);
+                }
+            });
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                    otpInputs[index - 1].focus();
+                }
+            });
+
+            // Only allow numbers
+            input.addEventListener('keypress', (e) => {
+                if (!/[0-9]/.test(e.key)) {
+                    e.preventDefault();
+                }
+            });
+        });
+
+        // Focus first input on load
+        otpInputs[0].focus();
+
+        // Verify button click
+        verifyBtn.addEventListener('click', () => {
+            const otp = Array.from(otpInputs).map(inp => inp.value).join('');
+            if (otp.length === 6) {
+                verifyOTP(otp);
+            } else {
+                showMessage('Please enter all 6 digits', 'error');
+            }
+        });
+
+        // Verify OTP function
+        async function verifyOTP(otp) {
+            verifyBtn.disabled = true;
+            verifyBtn.textContent = 'VERIFYING...';
+            messageDiv.innerHTML = '';
+
+            try {
+                const response = await fetch('/auth/verify-otp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ otp })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage('✓ Verification successful! Redirecting...', 'success');
+                    setTimeout(() => {
+                        window.location.href = data.redirectTo || '/dashboard';
+                    }, 1000);
+                } else {
+                    showMessage(data.error || 'Invalid OTP', 'error');
+                    verifyBtn.disabled = false;
+                    verifyBtn.textContent = 'VERIFY';
+                    // Clear inputs
+                    otpInputs.forEach(inp => inp.value = '');
+                    otpInputs[0].focus();
+                }
+            } catch (error) {
+                console.error('Verification error:', error);
+                showMessage('Network error. Please try again.', 'error');
+                verifyBtn.disabled = false;
+                verifyBtn.textContent = 'VERIFY';
+            }
+        }
+
+        // Resend OTP
+        resendBtn.addEventListener('click', async () => {
+            resendBtn.disabled = true;
+            resendBtn.textContent = 'Sending...';
+            messageDiv.innerHTML = '';
+
+            try {
+                const response = await fetch('/auth/resend-otp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage('✓ OTP resent successfully!', 'success');
+                } else {
+                    showMessage(data.error || 'Failed to resend OTP', 'error');
+                }
+            } catch (error) {
+                console.error('Resend error:', error);
+                showMessage('Network error. Please try again.', 'error');
+            } finally {
+                resendBtn.disabled = false;
+                resendBtn.textContent = 'Resend OTP';
+            }
+        });
+
+        // Show message helper
+        function showMessage(text, type) {
+            const className = type === 'error' ? 'error' : 'success';
+            messageDiv.innerHTML = `<div class="${className}">${text}</div>`;
+        }
+    </script>
+</body>
+</html>
